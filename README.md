@@ -17,7 +17,7 @@
    * Default swap value is 100, set this value to 1024. It is necessary for Rpi with 1 GB memory. 
    * For 2 GB or higher memory it is not required.
    
-5. `$ sudo reboot` : reboot to see changes
+5. `$ sudo reboot` : reboot to apply changes
 
 6. Now install `kawaii-player` on any other computer with any OS (GNU/Linux, OSX or Windows). We'll call this computer `Master` PC.
    * Enable Media Server on the Master 
