@@ -70,3 +70,7 @@
 * After changing above files one needs to restart the application or simply reboot the RPi.
 * Before changing config files manually, if possible backup the original. Wrong values can leave the application un-workable on the RPi.
 * If you've mouse/keyboard attached to the RPi, then one can change settings from the GUI itself without directly fiddling with config files.
+
+#### Is it possible to install kawaii-player on RPi 3 models?
+
+* Installing kawaii-player is not a problem on RPi 3. One can follow regular instructions as given in the README of the kawaii-player for installing it on debian/ubuntu based systems. But in RPi 3 models main problem is getting `mpv/libmpv` to work, with support for hardware decoding of videos. For this, one needs to update RPi firmware first and then needs to compile and install mpv from the source to get the proper video playback. Moreover there is no support for hardware decoding of H.265 videos. One can also try mpv binary to get the video playback. If one is interested in the audio playback only then mpv available in the official repository is more than enough - which will be installed automatically during installation of kawaii-player.
