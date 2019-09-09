@@ -19,12 +19,12 @@
    
 5. `$ sudo reboot` : reboot to apply changes
 
-6. Now install `kawaii-player` on any other computer with any OS (GNU/Linux, OSX or Windows). We'll call this computer `Master` PC.
+6. Now install [kawaii-player](https://github.com/kanishka-linux/kawaii-player#dependencies-and-installation) on any other computer (GNU/Linux, OSX or Windows). We'll call this computer `Master` PC, from which we'll cast videos to RPi
    * Enable Media Server on the Master 
    * Set `Preferences`->`PC-To-PC Casting` -> `Master`, which will add new menu `PC To PC Casting` to the playlist context menu.
    * From the newly added context menu, setup `Slave IP Address` (i.e. add address of RPi which one has noted down in step 2).
-   * Once slave ip addres has been setup on the master, one can cast any video/audio/playlist from master to Rpi, using the same context menu.
-   * For more information on `PC-To-PC Casting` in the context of kawaii-player, take a look at this [link](https://github.com/kanishka-linux/kawaii-player/wiki/Casting) 
+   * Once slave ip addres has been setup on the master, one can cast any video/audio/playlist from library of the master to Rpi, using the same context menu.
+   * For more information on `PC-To-PC Casting` in the context of kawaii-player, visit this [link](https://github.com/kanishka-linux/kawaii-player/wiki/Casting) 
    
 #### Any Advantage of using RPi and kawaii-player instead of regular casting device?
 
@@ -73,4 +73,7 @@
 
 #### Is it possible to install kawaii-player on RPi 3 models?
 
-* Installing kawaii-player is not a problem on RPi 3. One can follow regular instructions as given in the README of the kawaii-player for installing it on debian/ubuntu based systems. But in RPi 3 models main problem is getting `mpv/libmpv` to work, with support for hardware decoding of videos. For this, one needs to update RPi firmware first and then needs to compile and install mpv from the source to get the proper video playback. Moreover there is no support for hardware decoding of H.265 videos. One can also try mpv binary to get the video playback. If one is interested in the audio playback only then mpv available in the official repository is more than enough - which will be installed automatically during installation of kawaii-player.
+* Installing kawaii-player is not a problem on RPi 3. One can follow regular instructions as given in the [README](https://github.com/kanishka-linux/kawaii-player/blob/master/README.md) of the kawaii-player for installing it on debian/ubuntu based systems. 
+* In RPi 3 models main problem is getting `mpv/libmpv` to work, with proper support for hardware decoding of videos. For this, one needs to update RPi firmware first and then needs to compile and install mpv from the source. Moreover there is no support for hardware decoding of H.265 videos. 
+* If one is interested in the audio playback only then mpv available in the official repository is more than enough - which will be installed automatically during installation of kawaii-player.
+* `libmpv` most probably won't work with kawaii-player and RPi 3, so users may need to use `mpv` binary to get the audio/video playback. For playing video, users may need to use `vo=rpi` in the mpv config file.
