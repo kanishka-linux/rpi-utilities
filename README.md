@@ -1,6 +1,6 @@
 ## Instructions and scripts for installing kawaii-player on Raspberry Pi with some other miscellaneous scripts and configs.
 
-### Making Raspberry Pi 4 (Debian Buster) into a casting device with [kawaii-player](https://github.com/kanishka-linux/kawaii-player)
+### Making Raspberry Pi 4 (with Debian Buster) into a casting device with [kawaii-player](https://github.com/kanishka-linux/kawaii-player)
 
 1. `ssh` into Raspberry Pi (RPi) then execute following instructions for installing kawaii-player on it.
 
