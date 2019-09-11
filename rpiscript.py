@@ -119,7 +119,7 @@ def create_options_file(options_file, tmpdir, auth):
             f.write("\nBROWSER_BACKEND=QTWEBKIT")
             local_ip = get_lan_ip()
             f.write("\nLOCAL_STREAM_IP={}:9001".format(local_ip))
-            print("Servie is available at http://{}:9001".format(local_ip))
+            print("Reboot and attach RPi to HDMI display. Service will be available at http://{}:9001".format(local_ip))
             f.write("\nDEFAULT_DOWNLOAD_LOCATION="+tmpdir)
             f.write("\nKEEP_BACKGROUND_CONSTANT=no")
             f.write("\nTMP_REMOVE=no")
