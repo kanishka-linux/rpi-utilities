@@ -112,11 +112,12 @@ def create_mpv_config(mpv_config_file):
 def create_config_file(config_file):
     with open(config_file, 'w') as f:
         f.write("DefaultPlayer=libmpv")
+        f.write("\nVOLUME_TYPE=volume")
 
 def create_options_file(options_file, tmpdir, auth):
     if not os.path.exists(options_file):
         with open(options_file, 'w') as f:
-            f.write("\nBROWSER_BACKEND=QTWEBKIT")
+            f.write("BROWSER_BACKEND=QTWEBKIT")
             local_ip = get_lan_ip()
             f.write("\nLOCAL_STREAM_IP={}:9001".format(local_ip))
             print("Reboot and attach RPi to HDMI display. Service will be available at http://{}:9001".format(local_ip))
