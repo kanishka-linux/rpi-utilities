@@ -29,7 +29,7 @@
 #### Any Advantage of using RPi and kawaii-player instead of regular casting device?
 
 * [kawaii-player](https://github.com/kanishka-linux/kawaii-player) on RPi 4 (with Debian Buster) uses [libmpv](https://github.com/mpv-player/mpv) as a playback engine. Hence it can play almost all formats supported by mpv without requiring any kind of transcoding at the master or slave side.
-* RPi 4 officially supports hardware decoding of HEVC/H.265 videos. It was able to play 10-bit HEVC videos without much of a problem (except heating issue - one needs to add heat sink or cooling fan to the RPi setup to deal with it).
+* RPi 4 officially supports hardware decoding of HEVC/H.265 videos. It was able to play 10-bit HEVC videos without much of a problem (except heating issue - one needs to add heat sink or cooling fan to the RPi setup to deal with it). (latest version mpv/libmpv doesn't support proper hardware decoding on rpi using mmal, so support for libvlc has been added)
 * Cast local audio, local video, torrents, ytdl supported links and entire playlists from master to slave.
 * Easily change audio/subtitle track during playback of mkv files. One can also add external subtitles on the fly.
 * Good support for subtitle rendering (i.e. fonts, colors, border etc..) and color correction
