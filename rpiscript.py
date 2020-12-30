@@ -45,6 +45,7 @@ def create_deb_and_install():
     subprocess.call(["sudo", "apt", "autoremove", "-y"])
     subprocess.call(["sudo", "pip3", "install", "youtube-dl", "--upgrade"])
     subprocess.call(["sudo", "pip3", "install", "pympv", "--upgrade"])
+    subprocess.call(["sudo", "pip3", "install", "python-vlc", "--upgrade"])
     
 def create_config_files():
     if not os.path.exists(KAWAII_HOME):
@@ -111,7 +112,7 @@ def create_mpv_config(mpv_config_file):
         
 def create_config_file(config_file):
     with open(config_file, 'w') as f:
-        f.write("DefaultPlayer=libmpv")
+        f.write("DefaultPlayer=libvlc")
         f.write("\nVOLUME_TYPE=volume")
 
 def create_options_file(options_file, tmpdir, auth):
@@ -174,6 +175,7 @@ def create_options_file(options_file, tmpdir, auth):
             f.write("\nGAPLESS_PLAYBACK=True")
             f.write("\nGAPLESS_NETWORK_STREAM=True")
             f.write("\nPC_TO_PC_CASTING=Slave")
+            f.write("\nMPV_INPUT_IPC_SERVER=True")
             
 def set_user_password(text_val, pass_val):
     if not text_val:
