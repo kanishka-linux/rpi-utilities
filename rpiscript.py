@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 import getpass
 import hashlib
 import base64
@@ -46,8 +47,9 @@ def create_deb_and_install():
     subprocess.call(["sudo", "pip3", "install", "youtube-dl", "--upgrade"])
     subprocess.call(["sudo", "pip3", "install", "pympv", "--upgrade"])
     subprocess.call(["sudo", "pip3", "install", "python-vlc", "--upgrade"])
+    subprocess.call(["sudo", "pip3", "install", "yt-dlp", "--upgrade"])
     
-def create_config_files():
+def create_config_files(mpv_latest):
     if not os.path.exists(KAWAII_HOME):
         os.makedirs(KAWAII_HOME)
     options_file = os.path.join(KAWAII_HOME, "other_options.txt")
@@ -61,7 +63,7 @@ def create_config_files():
         os.makedirs(MPV_CONFIG_PATH)
     mpv_config_file = os.path.join(MPV_CONFIG_PATH, "config")
     autostart_desktop_file = os.path.join(AUTOSTART_PATH, "kawaii.desktop")
-    user = input("Setup user name for server:")
+    user = input("Setup user name for server(press enter to skip this):")
     if user:
         pass_val = getpass.getpass("Enter password for the server:")
         auth = set_user_password(user, pass_val)
@@ -71,7 +73,7 @@ def create_config_files():
         print("You have not setup username and password for media server")
     create_options_file(options_file, tmpdir, auth)
     create_config_file(config_file)
-    create_mpv_config(mpv_config_file)
+    create_mpv_config(mpv_config_file, mpv_latest)
     create_autostart_file(autostart_desktop_file)
 
 def create_autostart_file(autostart_desktop_file):
@@ -91,13 +93,13 @@ def create_autostart_file(autostart_desktop_file):
             f.write("\nX-LXDE-Need-Tray=true")
             f.write("\nX-LXQt-Need-Tray=true")
 
-def create_mpv_config(mpv_config_file):
+def create_mpv_config(mpv_config_file, mpv_latest):
     if not os.path.exists(mpv_config_file):
         with open(mpv_config_file, "w") as f:
             f.write("vo=libmpv")
             f.write("\nao=alsa")
             f.write("\nytdl=yes")
-            f.write("\nytdl-format=bestvideo[ext!=webm]+bestaudio[ext!=webm]/best[ext!=webm]")
+            f.write("\nytdl-format=bestvideo[height<=?1080][fps<=?30][vcodec!=?vp9]+bestaudio/best")
             f.write("\nfullscreen")
             f.write("\nframedrop=decoder")
             f.write("\ncache=auto")
@@ -106,6 +108,11 @@ def create_mpv_config(mpv_config_file):
             f.write("\ncache-pause-wait=4")
             f.write("\nvideo-aspect=-1")
             f.write("\nprefetch-playlist=yes")
+            if mpv_latest:
+                f.write("\nhwdec=drm-copy")
+                ytdlp = subprocess.check_output(["which", "yt-dlp"]).decode(sys.stdout.encoding).strip()
+                f.write('\nscript-opts=ytdl_hook-ytdl_path="{}"'.format(ytdlp))
+
         
 def create_config_file(config_file):
     with open(config_file, 'w') as f:
@@ -186,12 +193,47 @@ def set_user_password(text_val, pass_val):
     h = hashlib.sha256(new_txt_bytes)
     h_digest = h.hexdigest()
     return h_digest
-    
+
+def distro_info():
+    distro = subprocess.check_output(["lsb_release", "-ds"]).decode(sys.stdout.encoding)
+    return distro.strip().lower()
+
+def create_compton_autostart_file():
+    autostart_desktop_file = os.path.join(AUTOSTART_PATH, "compton.desktop")
+    if not os.path.exists(autostart_desktop_file):
+        with open(autostart_desktop_file, "w") as f:
+            f.write("[Desktop Entry]")
+            f.write("\nName=Compton")
+            f.write("\nType=Utility")
+            f.write("\nComment=Compositor")
+            f.write('\nExec=bash -c "compton --backend xrender --dbe --paint-on-overlay --detect-client-opacity -b"')
+            f.write("\nTerminal=false")
+            f.write("\nNoDisplay=false")
+            f.write("\nCategories=Audio,Video")
+            f.write("\nHidden=false")
+            f.write("\nX-GNOME-Autostart-Delay=0")
+            f.write("\nX-LXDE-Autostart-Delay=0")
+            f.write("\nX-LXDE-Need-Tray=true")
+            f.write("\nX-LXQt-Need-Tray=true")
+
+def download_mpv_and_install():
+    if 'bullseye' in distro_info():
+        subprocess.call(["wget", "https://non-gnu.uvt.nl/debian/bullseye/mpv/mpv_0.36.0+fruit.1_arm64.deb"])
+        subprocess.call(["sudo", "apt", "install", "-y", "./mpv_0.36.0+fruit.1_arm64.deb"])
+        subprocess.call(["sudo", "apt", "install", "-y", "compton"])
+        create_compton_autostart_file()
+
 def main():
+    mpv_latest = False
     create_deb_and_install()
-    create_config_files()
+    if sys.argv[1] == 'mpv-latest':
+        download_mpv_and_install()
+        mpv_latest = True
+    create_config_files(mpv_latest)
+
+    if mpv_latest:
+        print("For Best experience with mpv, use openbox with compton (which is installed) for tearfree video on fullscreen")
+        print("Please restart the RPi box to see changes!!")
 
 if __name__ == "__main__":
     main()
-
-
