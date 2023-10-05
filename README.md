@@ -9,6 +9,10 @@
         $ chmod +x rpiscript.py
         $ ./rpiscript.py
         
+        with latest mpv on debian bullseye
+
+        $ ./rpiscript mpv-latest
+                
 2. Note down local http address which will be printed on the terminal at the end of above step. It will be of the format `http://ip:port` (e.g. http://192.168.1.1:9001)
         
 3. Disable `xcompmgr` on RPi using `raspi-config`, otherwise it will cause screen tearing when playing video.
@@ -42,6 +46,11 @@
         
       $ sudo apt remove kawaii-player
       $ sudo apt autoremove
+
+* if compton is installed
+
+      $ sudo apt remove compton
+      $ rm ~/.config/autostart/compton.desktop
     
 * Remove kawaii-player folder if present in the existing directory
       
@@ -70,6 +79,7 @@
 * After changing above files one needs to restart the application or simply reboot the RPi.
 * Before changing config files manually, if possible backup the original. Wrong values can leave the application un-workable on the RPi.
 * If you've mouse/keyboard attached to the RPi, then one can change settings from the GUI itself without directly fiddling with config files.
+* For tearfree experince with latest mpv (v0.35+) use only openbox (not mutter),  disable xcompmgr and install compton. 
 
 #### Is it possible to install kawaii-player on RPi 3 models?
 
