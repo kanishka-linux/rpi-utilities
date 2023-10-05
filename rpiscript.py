@@ -116,7 +116,7 @@ def create_mpv_config(mpv_config_file, mpv_latest):
         
 def create_config_file(config_file):
     with open(config_file, 'w') as f:
-        f.write("DefaultPlayer=libvlc")
+        f.write("DefaultPlayer=libmpv")
         f.write("\nVOLUME_TYPE=volume")
 
 def create_options_file(options_file, tmpdir, auth):
@@ -151,12 +151,12 @@ def create_options_file(options_file, tmpdir, auth):
             f.write("\nBROADCAST_MESSAGE=False")
             f.write("\nMEDIA_SERVER_AUTOSTART=True")
             f.write("\n#THEME=default,system,dark")
-            f.write("\nTHEME=DARK")
+            f.write("\nTHEME=DEFAULT")
             f.write("\n#EXTRA_PLAYERS=vlc,kodi etc..")
             f.write("\nEXTRA_PLAYERS=NONE")
             f.write("\n#GLOBAL_FONT=Name of Font")
             f.write("\nGLOBAL_FONT=Default")
-            f.write("\nGLOBAL_FONT_SIZE=18")
+            f.write("\nGLOBAL_FONT_SIZE=20")
             f.write("\nFONT_BOLD=False")
             msg = ("\n#THUMBNAIL_TEXT_COLOR/LIST_TEXT_COLOR=red,green,blue,yellow,\
                    gray,white,black,cyan,magenta,darkgray,lightgray,darkred,\
@@ -172,7 +172,7 @@ def create_options_file(options_file, tmpdir, auth):
             f.write("\nREMEMBER_ASPECT_PER_VIDEO=True")
             f.write("\nVARIABLE_WIDTH_LIST=False")
             f.write("\nOSX_NATIVE_FULLSCREEN=False")
-            f.write("\nLIBMPV_API=OPENGL-CB")
+            f.write("\nLIBMPV_API=OPENGL-RENDER")
             f.write("\nDEVICE_PIXEL_RATIO=0.0")
             f.write("\nPLAYLIST_CONTINUE=True")
             f.write("\nDISPLAY_DEVICE=rpitv")
