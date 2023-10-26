@@ -7,6 +7,7 @@ import getpass
 import hashlib
 import base64
 import subprocess
+import shutil
 
 HOME = os.path.expanduser('~')
 
@@ -28,7 +29,7 @@ def get_lan_ip():
     print(final)
     return final
 
-def create_deb_and_install():
+def create_kawaii_player_deb_and_install():
     cwd = os.getcwd()
     git_dir_path = os.path.join(cwd, "kawaii-player")
     if not os.path.exists(git_dir_path): 
@@ -42,13 +43,30 @@ def create_deb_and_install():
             break
     subprocess.call(["sudo", "apt", "clean"])
     subprocess.call(["sudo", "apt", "install", "-y", "./{}".format(deb_file)])
-    subprocess.call(["sudo", "apt", "remove", "-y", "youtube-dl"])
+    subprocess.call(["sudo", "apt", "remove", "-y", "yt-dlp"])
     subprocess.call(["sudo", "apt", "autoremove", "-y"])
-    subprocess.call(["sudo", "pip3", "install", "youtube-dl", "--upgrade"])
-    subprocess.call(["sudo", "pip3", "install", "pympv", "--upgrade"])
-    subprocess.call(["sudo", "pip3", "install", "python-vlc", "--upgrade"])
-    subprocess.call(["sudo", "pip3", "install", "yt-dlp", "--upgrade"])
+    os.chdir(cwd)
+
+def install_python_packages():
+    subprocess.call(["sudo", "pip3", "install", "python-vlc", "--upgrade", "--break-system-packages"])
+    subprocess.call(["sudo", "pip3", "install", "yt-dlp", "--upgrade", "--break-system-packages"])
     
+def install_pympv():
+    cwd = os.getcwd()
+    mpv_c_path = os.path.join(cwd, "kawaii-player/mpv/mpv.c")
+    pympv_path = os.path.join(cwd, "pympv/")
+    if not os.path.exists(pympv_path):
+        subprocess.call(["git", "clone", "https://github.com/marcan/pympv"])
+    shutil.copy(mpv_c_path, pympv_path)
+    os.chdir(pympv_path)
+    subprocess.call(["pip3", "wheel", "--no-deps", "-w", "dist", "."])
+    dist_path = os.path.join(pympv_path, "dist")
+    for file_name in os.listdir(dist_path):
+        if file_name.endswith(".whl"):
+            whl_file = file_name
+            break
+    subprocess.call(["sudo", "pip3", "install", "dist/{}".format(whl_file), "--break-system-packages"])
+
 def create_config_files(mpv_latest):
     if not os.path.exists(KAWAII_HOME):
         os.makedirs(KAWAII_HOME)
@@ -198,6 +216,8 @@ def distro_info():
     distro = subprocess.check_output(["lsb_release", "-ds"]).decode(sys.stdout.encoding)
     return distro.strip().lower()
 
+#Not required - if used wayland
+#But when used with X - compton with following arguments provides good experience
 def create_compton_autostart_file():
     autostart_desktop_file = os.path.join(AUTOSTART_PATH, "compton.desktop")
     if not os.path.exists(autostart_desktop_file):
@@ -216,23 +236,29 @@ def create_compton_autostart_file():
             f.write("\nX-LXDE-Need-Tray=true")
             f.write("\nX-LXQt-Need-Tray=true")
 
-def download_mpv_and_install():
-    if 'bullseye' in distro_info():
+def download_mpv_and_install(distro):
+    if distro == "bullseye":
         subprocess.call(["wget", "https://non-gnu.uvt.nl/debian/bullseye/mpv/mpv_0.36.0+fruit.1_arm64.deb"])
-        subprocess.call(["sudo", "apt", "install", "-y", "./mpv_0.36.0+fruit.1_arm64.deb"])
-        subprocess.call(["sudo", "apt", "install", "-y", "compton"])
-        create_compton_autostart_file()
+    elif distro == "bookworm":
+        subprocess.call(["wget", "https://non-gnu.uvt.nl/debian/bookworm/mpv/mpv_0.36.0+fruit.1_arm64.deb"])
+
+    subprocess.call(["sudo", "apt", "install", "-y", "./mpv_0.36.0+fruit.1_arm64.deb"])
 
 def main():
     mpv_latest = False
-    create_deb_and_install()
-    if sys.argv[1] == 'mpv-latest':
-        download_mpv_and_install()
+    create_kawaii_player_deb_and_install()
+    install_python_packages()
+    install_pympv()
+    if len(sys.argv) > 1 and sys.argv[1] == 'mpv-latest' and 'bullseye' in distro_info():
+        download_mpv_and_install("bullseye")
+        mpv_latest = True
+    elif 'bookworm' in distro_info():
+        download_mpv_and_install("bookworm")
         mpv_latest = True
     create_config_files(mpv_latest)
 
     if mpv_latest:
-        print("For Best experience with mpv, use openbox with compton (which is installed) for tearfree video on fullscreen")
+        print("For Best experience with mpv, use wayland. Enable wayland using raspi-config->Advance-options->Wayland ")
         print("Please restart the RPi box to see changes!!")
 
 if __name__ == "__main__":
