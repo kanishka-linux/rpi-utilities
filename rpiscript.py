@@ -34,7 +34,7 @@ def create_kawaii_player_deb_and_install():
     git_dir_path = os.path.join(cwd, "kawaii-player")
     if not os.path.exists(git_dir_path): 
         subprocess.call(["git", "clone", "https://github.com/kanishka-linux/kawaii-player"])
-    deb_dir = os.path.join(cwd, "kawaii-player/ubuntu") 
+    deb_dir = os.path.join(cwd, "kawaii-player/ubuntu")
     os.chdir(deb_dir)
     subprocess.call(["python3", "create_deb.py"])
     for file_name in os.listdir(deb_dir):
@@ -47,11 +47,21 @@ def create_kawaii_player_deb_and_install():
     subprocess.call(["sudo", "apt", "autoremove", "-y"])
     os.chdir(cwd)
 
-def install_python_packages():
-    subprocess.call(["sudo", "pip3", "install", "python-vlc", "--upgrade", "--break-system-packages"])
-    subprocess.call(["sudo", "pip3", "install", "yt-dlp", "--upgrade", "--break-system-packages"])
+def extra_install_args(distro_name):
+    extra_args = []
+    if distro_name == "bookworm":
+        extra_args = ["--break-system-packages"]
+
+    return extra_args
+
+def install_python_packages(distro_name):
+    python_vlc = ["sudo", "pip3", "install", "python-vlc", "--upgrade"]
+    yt_dlp = ["sudo", "pip3", "install", "yt-dlp", "--upgrade"]
+
+    subprocess.call(python_vlc + extra_install_args(distro_name))
+    subprocess.call(yt_dlp + extra_install_args(distro_name))
     
-def install_pympv():
+def install_pympv(distro_name):
     cwd = os.getcwd()
     mpv_c_path = os.path.join(cwd, "kawaii-player/mpv/mpv.c")
     pympv_path = os.path.join(cwd, "pympv/")
@@ -65,7 +75,8 @@ def install_pympv():
         if file_name.endswith(".whl"):
             whl_file = file_name
             break
-    subprocess.call(["sudo", "pip3", "install", "dist/{}".format(whl_file), "--break-system-packages"])
+    pympv_cmd = ["sudo", "pip3", "install", "dist/{}".format(whl_file)]
+    subprocess.call(pympv_cmd + extra_install_args(distro_name))
 
 def create_config_files(mpv_latest):
     if not os.path.exists(KAWAII_HOME):
@@ -131,7 +142,7 @@ def create_mpv_config(mpv_config_file, mpv_latest):
                 ytdlp = subprocess.check_output(["which", "yt-dlp"]).decode(sys.stdout.encoding).strip()
                 f.write('\nscript-opts=ytdl_hook-ytdl_path="{}"'.format(ytdlp))
 
-        
+
 def create_config_file(config_file):
     with open(config_file, 'w') as f:
         f.write("DefaultPlayer=libmpv")
@@ -198,7 +209,7 @@ def create_options_file(options_file, tmpdir, auth):
             f.write("\nGAPLESS_NETWORK_STREAM=True")
             f.write("\nPC_TO_PC_CASTING=Slave")
             f.write("\nMPV_INPUT_IPC_SERVER=True")
-            
+
 def set_user_password(text_val, pass_val):
     if not text_val:
         text_val = ''
@@ -246,13 +257,22 @@ def download_mpv_and_install(distro):
 
 def main():
     mpv_latest = False
+    distro = distro_info()
+    if "bullseye" in distro:
+        distro_name = "bullseye"
+    elif "bookworm" in distro:
+        distro_name = "bookworm"
+    else:
+        distro_name = "other"
+
     create_kawaii_player_deb_and_install()
-    install_python_packages()
-    install_pympv()
-    if len(sys.argv) > 1 and sys.argv[1] == 'mpv-latest' and 'bullseye' in distro_info():
+    install_python_packages(distro_name)
+    install_pympv(distro_name)
+
+    if len(sys.argv) > 1 and sys.argv[1] == 'mpv-latest' and distro_name == 'bullseye':
         download_mpv_and_install("bullseye")
         mpv_latest = True
-    elif 'bookworm' in distro_info():
+    elif len(sys.argv) > 1 and sys.argv[1] == 'mpv-latest' and distro_name == "bookworm":
         download_mpv_and_install("bookworm")
         mpv_latest = True
     create_config_files(mpv_latest)
