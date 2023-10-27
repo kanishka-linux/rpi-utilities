@@ -275,7 +275,7 @@ def main():
 
     create_kawaii_player_deb_and_install()
     install_python_packages(distro_name)
-    if distro_name in ["ubuntu-22-04-lts", "bullseye", "other"] and not mpv_latest:
+    if distro_name in ["ubuntu-22-04-lts", "bullseye", "other"]:
         install_pympv_old()
     else:
         install_pympv_git(distro_name)
