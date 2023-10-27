@@ -60,8 +60,12 @@ def install_python_packages(distro_name):
 
     subprocess.call(python_vlc + extra_install_args(distro_name))
     subprocess.call(yt_dlp + extra_install_args(distro_name))
-    
-def install_pympv(distro_name):
+
+def install_pympv_old():
+    pympv = ["sudo", "pip3", "install", "pympv", "--upgrade"]
+    subprocess.call(pympv)
+
+def install_pympv_git(distro_name):
     cwd = os.getcwd()
     mpv_c_path = os.path.join(cwd, "kawaii-player/mpv/mpv.c")
     pympv_path = os.path.join(cwd, "pympv/")
@@ -257,24 +261,30 @@ def download_mpv_and_install(distro):
 
 def main():
     mpv_latest = False
+    if len(sys.argv) > 1 and sys.argv[1] == 'mpv-latest':
+        mpv_latest = True
     distro = distro_info()
     if "bullseye" in distro:
         distro_name = "bullseye"
     elif "bookworm" in distro:
         distro_name = "bookworm"
+    elif "ubuntu 22.04" in distro:
+        distro_name = "ubuntu-22-04-lts"
     else:
         distro_name = "other"
 
     create_kawaii_player_deb_and_install()
     install_python_packages(distro_name)
-    install_pympv(distro_name)
+    if distro_name in ["ubuntu-22-04-lts", "bullseye", "other"] and not mpv_latest:
+        install_pympv_old()
+    else:
+        install_pympv_git(distro_name)
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'mpv-latest' and distro_name == 'bullseye':
+    if mpv_latest and distro_name == 'bullseye':
         download_mpv_and_install("bullseye")
-        mpv_latest = True
-    elif len(sys.argv) > 1 and sys.argv[1] == 'mpv-latest' and distro_name == "bookworm":
+    elif mpv_latest and distro_name == "bookworm":
         download_mpv_and_install("bookworm")
-        mpv_latest = True
+
     create_config_files(mpv_latest)
 
     if mpv_latest:
