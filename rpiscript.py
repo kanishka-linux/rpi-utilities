@@ -67,7 +67,7 @@ def install_pympv_old():
 
 def install_pympv_git(distro_name):
     cwd = os.getcwd()
-    mpv_c_path = os.path.join(cwd, "kawaii-player/mpv/mpv.c")
+    mpv_c_path = os.path.join(cwd, "kawaii-player/pympv/mpv.c")
     pympv_path = os.path.join(cwd, "pympv/")
     if not os.path.exists(pympv_path):
         subprocess.call(["git", "clone", "https://github.com/marcan/pympv"])
