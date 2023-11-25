@@ -37,10 +37,7 @@ def create_kawaii_player_deb_and_install():
     deb_dir = os.path.join(cwd, "kawaii-player/ubuntu")
     os.chdir(deb_dir)
     subprocess.call(["python3", "create_deb.py"])
-    for file_name in os.listdir(deb_dir):
-        if file_name.endswith(".deb"):
-            deb_file = file_name
-            break
+    deb_file = list(filter(lambda x: x.endswith(".deb"), os.listdir(deb_dir)))[0]
     subprocess.call(["sudo", "apt", "clean"])
     subprocess.call(["sudo", "apt", "install", "-y", "./{}".format(deb_file)])
     subprocess.call(["sudo", "apt", "remove", "-y", "yt-dlp"])
@@ -55,32 +52,9 @@ def extra_install_args(distro_name):
     return extra_args
 
 def install_python_packages(distro_name):
-    python_vlc = ["sudo", "pip3", "install", "python-vlc", "--upgrade"]
     yt_dlp = ["sudo", "pip3", "install", "yt-dlp", "--upgrade"]
 
-    subprocess.call(python_vlc + extra_install_args(distro_name))
     subprocess.call(yt_dlp + extra_install_args(distro_name))
-
-def install_pympv_old():
-    pympv = ["sudo", "pip3", "install", "pympv", "--upgrade"]
-    subprocess.call(pympv)
-
-def install_pympv_git(distro_name):
-    cwd = os.getcwd()
-    mpv_c_path = os.path.join(cwd, "kawaii-player/pympv/mpv.c")
-    pympv_path = os.path.join(cwd, "pympv/")
-    if not os.path.exists(pympv_path):
-        subprocess.call(["git", "clone", "https://github.com/marcan/pympv"])
-    shutil.copy(mpv_c_path, pympv_path)
-    os.chdir(pympv_path)
-    subprocess.call(["pip3", "wheel", "--no-deps", "-w", "dist", "."])
-    dist_path = os.path.join(pympv_path, "dist")
-    for file_name in os.listdir(dist_path):
-        if file_name.endswith(".whl"):
-            whl_file = file_name
-            break
-    pympv_cmd = ["sudo", "pip3", "install", "dist/{}".format(whl_file)]
-    subprocess.call(pympv_cmd + extra_install_args(distro_name))
 
 def create_config_files(mpv_latest):
     if not os.path.exists(KAWAII_HOME):
@@ -153,6 +127,7 @@ def create_config_file(config_file):
         f.write("\nVOLUME_TYPE=volume")
 
 def create_options_file(options_file, tmpdir, auth):
+    ytdlp_path = subprocess.check_output(["which", "yt-dlp"]).decode(sys.stdout.encoding).strip()
     if not os.path.exists(options_file):
         with open(options_file, 'w') as f:
             f.write("BROWSER_BACKEND=QTWEBKIT")
@@ -176,7 +151,7 @@ def create_options_file(options_file, tmpdir, auth):
             f.write("\nCOOKIE_PLAYLIST_EXPIRY_LIMIT=24")
             f.write("\nLOGGING=Off")
             f.write("\n#YTDL_PATH=default,automatic")
-            f.write("\nYTDL_PATH=DEFAULT")
+            f.write("\nYTDL_PATH={}".format(ytdlp_path))
             f.write("\nANIME_REVIEW_SITE=False")
             f.write("\nGET_MUSIC_METADATA=False")
             f.write("\nREMOTE_CONTROL=True")
@@ -275,10 +250,6 @@ def main():
 
     create_kawaii_player_deb_and_install()
     install_python_packages(distro_name)
-    if distro_name in ["ubuntu-22-04-lts", "bullseye", "other"]:
-        install_pympv_old()
-    else:
-        install_pympv_git(distro_name)
 
     if mpv_latest and distro_name == 'bullseye':
         download_mpv_and_install("bullseye")
