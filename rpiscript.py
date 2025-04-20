@@ -32,6 +32,9 @@ def get_lan_ip():
 def create_kawaii_player_deb_and_install():
     cwd = os.getcwd()
     git_dir_path = os.path.join(cwd, "kawaii-player")
+    subprocess.call(["sudo", "apt", "update"])
+    subprocess.call(["sudo", "apt", "upgrade", "-y"])
+    subprocess.call(["sudo", "apt", "install", "git", "libmpv-dev"])
     if not os.path.exists(git_dir_path): 
         subprocess.call(["git", "clone", "https://github.com/kanishka-linux/kawaii-player"])
     deb_dir = os.path.join(cwd, "kawaii-player/ubuntu")
