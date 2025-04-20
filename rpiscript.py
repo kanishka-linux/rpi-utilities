@@ -42,7 +42,7 @@ def create_kawaii_player_deb_and_install():
     subprocess.call(["python3", "create_deb.py"])
     deb_file = list(filter(lambda x: x.endswith(".deb"), os.listdir(deb_dir)))[0]
     subprocess.call(["sudo", "apt", "clean"])
-    subprocess.call(["sudo", "apt", "install", "-y", "./{}".format(deb_file)])
+    subprocess.call(["sudo", "apt", "install", "-y", "--reinstall", "./{}".format(deb_file)])
     subprocess.call(["sudo", "apt", "remove", "-y", "yt-dlp"])
     subprocess.call(["sudo", "apt", "autoremove", "-y"])
     os.chdir(cwd)
@@ -235,7 +235,7 @@ def download_mpv_and_install(distro):
     elif distro == "bookworm":
         subprocess.call(["wget", "https://non-gnu.uvt.nl/debian/bookworm/mpv/mpv_0.36.0+fruit.1_arm64.deb"])
 
-    subprocess.call(["sudo", "apt", "install", "-y", "./mpv_0.36.0+fruit.1_arm64.deb"])
+    subprocess.call(["sudo", "apt", "install", "-y", "--reinstall", "./mpv_0.36.0+fruit.1_arm64.deb"])
 
 def main():
     mpv_latest = False
